@@ -1,0 +1,7 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: common-sub
+  labels:
+    kubernetes.io/metadata.name: common-sub

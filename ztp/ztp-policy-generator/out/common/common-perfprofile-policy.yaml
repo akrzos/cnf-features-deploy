@@ -1,0 +1,53 @@
+apiVersion: policy.open-cluster-management.io/v1
+kind: Policy
+metadata:
+    name: common-perfprofile-policy
+    namespace: common-sub
+    annotations:
+        policy.open-cluster-management.io/categories: CM Configuration Management
+        policy.open-cluster-management.io/controls: CM-2 Baseline Configuration
+        policy.open-cluster-management.io/standards: NIST SP 800-53
+spec:
+    remediationAction: enforce
+    disabled: false
+    policy-templates:
+        - objectDefinition:
+            apiVersion: policy.open-cluster-management.io/v1
+            kind: ConfigurationPolicy
+            metadata:
+                name: common-perfprofile-policy-config
+            spec:
+                remediationAction: enforce
+                severity: low
+                namespaceselector:
+                    exclude:
+                        - kube-*
+                    include:
+                        - '*'
+                object-templates:
+                    - complianceType: musthave
+                      objectDefinition:
+                        apiVersion: performance.openshift.io/v1
+                        kind: PerformanceProfile
+                        metadata:
+                            name: perfprofile-policy
+                        spec:
+                            additionalKernelArgs: []
+                            cpu:
+                                isolated: 4-7
+                                reserved: 0-3
+                            hugepages:
+                                defaultHugepagesSize: 1G
+                                pages:
+                                    - count: 1
+                                      size: 1G
+                            machineConfigPoolSelector:
+                                pools.operator.machineconfiguration.openshift.io/master: ""
+                            net:
+                                userLevelNetworking: true
+                            nodeSelector:
+                                node-role.kubernetes.io/master: ""
+                            numa:
+                                topologyPolicy: restricted
+                            realTimeKernel:
+                                enabled: false
